@@ -5,8 +5,10 @@ from random import randrange
 import matplotlib.pyplot as plt
 import io
 import base64
+import config
+import os
 
-DB_NAME = r'C:\Users\altuhov.n.a\PycharmProjects\finance_graph_work_flask\app\db\finance.db'
+DB_NAME = config.DB_NAME
 
 
 # Выполнение SQL, без возврата значения, с сохранением
@@ -25,6 +27,10 @@ def __exec_sql(sql):
 
 # Выполнение SQL и получение результата
 def __get_data(sql):
+
+    if os.path.exists(DB_NAME):
+        print('file exist!')
+
     try:
         conn = sqlite3.connect(DB_NAME)
         ca = pd.read_sql(sql, conn)
@@ -187,6 +193,5 @@ if __name__ == '__main__':
     # print(get_all_companies())
     # print(get_company_volume(130))
     # print(get_companies_list())
-    df = get_chart_of_company_volume([8471, 8342], '2018-04-12', '2018-08-15')
-
+    get_chart_of_company_volume([8471, 8342], '2018-04-12', '2018-08-15')
     # print(get_companies_list())

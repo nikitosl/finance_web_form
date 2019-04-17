@@ -38,7 +38,7 @@ class FinanceForm(Form):
     # ________________________________________________________ BRANDS
     add_company_btn = SubmitField(label='Добавить')
     del_company_btn = SubmitField(label='Удалить')
-    company_lst = FieldList(SelectField(label='Название колонки:', choices=company_tuple_list,
+    company_lst = FieldList(SelectField(label='Название компании:', choices=company_tuple_list,
                                         validators=[not_empty_validator], coerce=int))
 
     # ________________________________________________________ START DATE
