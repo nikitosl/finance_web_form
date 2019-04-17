@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block title %}
+    FinanceForm
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="width:700px;">
+        <div class="panel" style="background-color: #EEEEEE; padding: 50px; padding-top:20px; padding-bottom:10px; padding-right: 70px">
+            <h2 align="center" style="margin-bottom: 20px">Настройка параметров графика</h2>
+            <form action="" method="post" name="settings">
+                <dl>
+                    {{ form.csrf_token }}
+
+                    <!-------------------------------------------------------------------BRANDS-->
+                    <div style="float: left; margin-right: 70px; ">Компании:</div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                        {{ wtf.form_field(form.add_company_btn, class="btn btn-secondary") }}
+                        {{ wtf.form_field(form.del_company_btn, class="btn btn-secondary") }}
+                    </div>
+                    <div style="margin-left:70px">
+                        {% for field in form.company_lst %}
+                            {{ wtf.form_field(field) }}
+                        {% endfor %}
+                    </div>
+
+                    <!-------------------------------------------------------------------START DATE-->
+                    <div style="margin-bottom: 100px">
+                        <div style="float: left; width: 250px">
+                            {{ wtf.form_field(form.start_date_dt_tx) }}
+                        </div>
+                        <div style="float: right; width: 250px">
+                            {{ wtf.form_field(form.finish_date_dt_tx) }}
+                        </div>
+                    </div>
+
+
+                </dl>
+                <!--<div style="float: top">-->
+                    <!--<hr>-->
+                <!--</div>-->
+
+                <!-------------------------------------------------------------------SAVE / CANCEL-->
+                <div style="margin-top: 20px">
+                    <div style="float: right;"> {{ wtf.form_field(form.print_btn, class="btn btn-primary") }} </div>
+                    <div style="margin-right: 120px;"> {{ wtf.form_field(form.clear_btn, class="btn btn-danger") }} </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
