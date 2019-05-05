@@ -8,7 +8,8 @@ import base64
 import config
 import os
 
-DB_NAME = config.DB_NAME
+DB_NAME = config.DB_NAME_small
+# DB_NAME = config.DB_NAME
 
 
 # Выполнение SQL, без возврата значения, с сохранением
@@ -162,13 +163,21 @@ def __company_clear(company=None):
     __exec_sql(data)
 
 
-# Вставка тестовой таблицы
+# Вставка тестовой компании
 def insert_handmade_company():
     company = {
         'iexId': '11',
         'name': 'Apple Inc.',
         'date': generate_random_date(),
         'symbol': 'AAPL'
+    }
+    insert_company(company)
+
+    company = {
+        'iexId': '4563',
+        'name': 'Microsoft Corporation',
+        'date': generate_random_date(),
+        'symbol': 'MSFT'
     }
     insert_company(company)
 
@@ -189,9 +198,9 @@ def get_companies_list():
 
 if __name__ == '__main__':
 
-    # __company_clear()
-    # print(get_all_companies())
-    # print(get_company_volume(130))
-    # print(get_companies_list())
-    get_chart_of_company_volume([8471, 8342], '2018-04-12', '2018-08-15')
-    # print(get_companies_list())
+    __company_clear()
+    insert_handmade_company()
+    df = get_all_companies()
+    print(df)
+
+

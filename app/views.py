@@ -28,9 +28,7 @@ def index():
                 form.company_lst.pop_entry()
 
         elif form.clear_btn.data:
-            form.company_lst.data = []
-            form.start_date_dt_tx.data = datetime.date(2018, 4, 5)
-            form.start_date_dt_tx.data = datetime.date(2019, 4, 11)
+            form.data_clear()
 
 
         if form.print_btn.data and form.validate_on_submit():

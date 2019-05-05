@@ -50,3 +50,10 @@ class FinanceForm(Form):
     print_btn = SubmitField(label='Нарисовать')
     clear_btn = SubmitField(label='Очистить')
 
+    def data_clear(self):
+        while len(self.company_lst.data) > 0:
+            self.company_lst.pop_entry()
+
+
+
+
