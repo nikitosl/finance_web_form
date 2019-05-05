@@ -203,4 +203,3 @@ if __name__ == '__main__':
     df = get_all_companies()
     print(df)
 
-
