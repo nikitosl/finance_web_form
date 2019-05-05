@@ -38,8 +38,8 @@ class FinanceForm(Form):
     # ________________________________________________________ BRANDS
     add_company_btn = SubmitField(label='Добавить')
     del_company_btn = SubmitField(label='Удалить')
-    company_lst = FieldList(SelectField(label='Название компании:', choices=company_tuple_list,
-                                        validators=[not_empty_validator], coerce=int))
+    company_lst = FieldList(SelectField(label='Название компании:', choices=company_tuple_list, coerce=int),
+                            validators=[not_empty_validator])
 
     # ________________________________________________________ START DATE
     start_date_dt_tx = DateField(label='Начальная дата:', format='%d.%m.%Y',
@@ -54,6 +54,10 @@ class FinanceForm(Form):
         while len(self.company_lst.data) > 0:
             self.company_lst.pop_entry()
 
+    def add_company(self):
+        self.company_lst.append_entry()
 
-
+    def remove_company(self):
+        if len(self.company_lst.data) > 0:
+            self.company_lst.pop_entry()
 
