@@ -8,7 +8,7 @@ import base64
 import config
 import os
 
-DB_NAME = config.DB_NAME_small
+DB_NAME = config.DB_NAME
 # DB_NAME = config.DB_NAME
 
 
@@ -75,6 +75,7 @@ def create_table_volume():
             company_id integer,
             date text NOT NULL,
             volume integer NOT NULL,
+            vwap float NOT NULL,
             FOREIGN KEY (company_id) REFERENCES company (id)
         );
     '''
@@ -105,20 +106,35 @@ def insert_volumes(df):
 
 
 # Получение всех объёмов по определённой компании
-def get_chart_of_company_volume(company_id_list, date_from, date_to):
+def get_chart_of_company_volume(company_id_list, date_from, date_to, type='vwap'):
     company_id_list = ', '.join([str(i) for i in company_id_list])
-    data = f'''
-        SELECT 
-            c.id company_id,
-            c.name company_name,
-            v.date date,
-            v.volume volume
-        FROM company c
-            JOIN volume v
-                ON v.company_id = c.id
-        WHERE v.date BETWEEN "{date_from}" AND "{date_to}"  
-            AND c.id IN ({company_id_list})             
-    '''
+
+    if type == 'vwap':
+        data = f'''
+            SELECT 
+                c.id company_id,
+                c.name company_name,
+                v.date date,
+                v.vwap volume
+            FROM company c
+                JOIN volume v
+                    ON v.company_id = c.id
+            WHERE v.date BETWEEN "{date_from}" AND "{date_to}"  
+                AND c.id IN ({company_id_list})             
+                '''
+    else:
+        data = f'''
+            SELECT 
+                c.id company_id,
+                c.name company_name,
+                v.date date,
+                v.volume volume
+            FROM company c
+                JOIN volume v
+                    ON v.company_id = c.id
+            WHERE v.date BETWEEN "{date_from}" AND "{date_to}"  
+                AND c.id IN ({company_id_list})             
+        '''
     df = __get_data(data)
     # plt.close('all')
     df.groupby(['date', 'company_name'])['volume'].sum().unstack().plot(figsize=(10, 6))
@@ -135,8 +151,16 @@ def get_chart_of_company_volume(company_id_list, date_from, date_to):
 def get_all_companies():
     data = f'''
             SELECT *
-            FROM company c        
+            FROM company        
         '''
+    return __get_data(data)
+
+
+def get_all_volumes():
+    data = f'''
+            SELECT *
+            FROM volume        
+            '''
     return __get_data(data)
 
 
@@ -148,8 +172,7 @@ def generate_random_date():
     date = datetime.date(year=year, month=month, day=day)
     return str(date)
 
-
-# Удаление данных из таблицы Компании
+# Удаление данных из таблицы Company
 def __company_clear(company=None):
     if not company:
         data = '''
@@ -158,8 +181,38 @@ def __company_clear(company=None):
     else:
         data = f'''
                     DELETE FROM company
-                    WHERE id = {company['iexId']} 
+                    WHERE company.id = {company['iexId']} 
                 '''
+    __exec_sql(data)
+
+
+# Удаление данных из таблицы Volume
+def __volume_clear(company=None):
+    if not company:
+        data = '''
+            DELETE FROM volume
+        '''
+    else:
+        data = f'''
+            DELETE FROM volume
+            WHERE volume.company_id = {company['iexId']} 
+        '''
+    __exec_sql(data)
+
+
+# Удаление таблицы Company
+def __remove_company_table():
+    data = '''
+        DROP TABLE IF EXISTS company
+    '''
+    __exec_sql(data)
+
+
+# Удаление таблицы Volume
+def __remove_volume_table():
+    data = '''
+        DROP TABLE IF EXISTS volume
+    '''
     __exec_sql(data)
 
 
@@ -182,6 +235,7 @@ def insert_handmade_company():
     insert_company(company)
 
 
+# Получение списка кортежей (id компании, название компании)
 def get_companies_list():
     data = f'''
                 SELECT 
@@ -198,8 +252,11 @@ def get_companies_list():
 
 if __name__ == '__main__':
 
-    __company_clear()
-    insert_handmade_company()
-    df = get_all_companies()
-    print(df)
+    # __remove_volume_table()
+
+    print(get_all_volumes())
+
+    # insert_handmade_company()
+    # df = get_all_companies()
+    # print(df)
 

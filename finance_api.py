@@ -27,12 +27,11 @@ def save_company_info(company_list):
     for company in company_list:
         company_info = get_company_info(company)
         try:
-            json.dump(company_info, open(f'tech_companies/info/({company["iexId"]}) {company["name"]}.json', 'w'))
+            json.dump(company_info, open(f'app/db/tech_companies/info/({company["iexId"]}) {company["name"]}.json', 'w'))
         except Exception as e:
             print(f'Error during "save_company_info": {e}')
         else:
             print(f'Сохранена инфа за год по компании "{company["name"]}"')
-
 
 
 def save_all_companies():
@@ -64,7 +63,7 @@ def save_random_companies():
 
 def get_info_df(file_name):
     info = json.load(open(file_name))
-    df = pd.DataFrame(info)[['date', 'volume']]
+    df = pd.DataFrame(info)[['date', 'volume', 'vwap']]
     return df
 
 
@@ -77,7 +76,7 @@ def fill_volumes():
         return None
 
 
-    info_dir = r'C:\Users\altuhov.n.a\PycharmProjects\free_project\finance_api\tech_companies\info'
+    info_dir = r'/Users/nikita/PycharmProjects/finance_web_form/app/db/tech_companies/info'
     for info in os.listdir(info_dir):
         info_df = get_info_df(os.path.join(info_dir, info))
         info_df['company_id'] = get_id(info)
@@ -87,11 +86,14 @@ def fill_volumes():
 
 if __name__ == '__main__':
 
-    # comps = json.load(open('tech_companies/tech_companies.json'))
+    # # Загрузка данных по техническим компаниям
+    # comps = json.load(open('app/db/tech_companies/tech_companies.json'))
     # print(len(comps))
     # save_company_info(comps)
 
+    # Заполнение БД данными
     # fill_volumes()
+
     lst = db_worker.get_companies_list()
     print(list(enumerate(lst, start=1)))
 

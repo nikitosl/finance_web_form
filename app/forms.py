@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm as Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, Label, TextField, FieldList, FormField, FileField, IntegerField, DateField, SelectField, validators
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, Label, TextField, FieldList, FormField, FileField, IntegerField, DateField, SelectField, validators
 from wtforms.validators import InputRequired, Email, Length, AnyOf
 from app.db import db_worker
 import datetime
@@ -35,7 +35,7 @@ def finish_date_validator(form, field):
 class FinanceForm(Form):
     company_tuple_list = sorted(db_worker.get_companies_list(), key=lambda x: x[1])
 
-    # ________________________________________________________ BRANDS
+    # ________________________________________________________ COMPANIES
     add_company_btn = SubmitField(label='Добавить')
     del_company_btn = SubmitField(label='Удалить')
     company_lst = FieldList(SelectField(label='Название компании:', choices=company_tuple_list, coerce=int))
@@ -45,7 +45,10 @@ class FinanceForm(Form):
                                     validators=[start_date_validator], default=datetime.date(2018, 4, 5))
     finish_date_dt_tx = DateField(label='Конечная дата:', format='%d.%m.%Y',
                                     validators=[finish_date_validator], default=datetime.date(2019, 4, 11))
-
+    # _________________________________________________________ CHART TYPE
+    chart_type_rbtn = RadioField('Критерий сравнения',
+                                choices=[('volume', 'Объем продаж акций'), ('vwap', 'Курс акций')])
+    # _________________________________________________________ BUTTONS
     print_btn = SubmitField(label='Нарисовать')
     clear_btn = SubmitField(label='Очистить')
 

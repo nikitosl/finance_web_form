@@ -6,5 +6,4 @@ CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 
 DB_NAME = os.path.join(CURRENT_DIR, 'app', 'db', 'finance.db')
-DB_NAME_small = os.path.join(CURRENT_DIR, 'app', 'db', 'finance_small.db')
 

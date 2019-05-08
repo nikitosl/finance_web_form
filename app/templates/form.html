@@ -13,7 +13,11 @@
                 <dl>
                     {{ form.csrf_token }}
 
-                    <!-------------------------------------------------------------------BRANDS-->
+
+                    <div style="display: inline">
+                        {{ wtf.form_field(form.chart_type_rbtn) }}
+                    </div>
+                    <!-------------------------------------------------------------------COMPANIES-->
                     <div style="float: left; margin-right: 70px; ">Компании:</div>
                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                         {{ wtf.form_field(form.add_company_btn, class="btn btn-secondary") }}
