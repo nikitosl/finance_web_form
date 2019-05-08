@@ -13,10 +13,10 @@
                 <dl>
                     {{ form.csrf_token }}
 
-
-                    <div style="display: inline">
+                    <div style="display: flex; justify-content: space-between; width: 100%">
                         {{ wtf.form_field(form.chart_type_rbtn) }}
                     </div>
+
                     <!-------------------------------------------------------------------COMPANIES-->
                     <div style="float: left; margin-right: 70px; ">Компании:</div>
                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
