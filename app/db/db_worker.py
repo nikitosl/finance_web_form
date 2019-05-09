@@ -11,7 +11,7 @@ import os
 DB_NAME = config.DB_NAME
 # DB_NAME = config.DB_NAME
 
-
+# region Run SQL
 # Выполнение SQL, без возврата значения, с сохранением
 def __exec_sql(sql):
     try:
@@ -28,9 +28,6 @@ def __exec_sql(sql):
 
 # Выполнение SQL и получение результата
 def __get_data(sql):
-
-    if os.path.exists(DB_NAME):
-        print('file exist!')
 
     try:
         conn = sqlite3.connect(DB_NAME)
@@ -53,8 +50,10 @@ def __insert_df(df: pd.DataFrame, table):
     else:
         conn.commit()
         conn.close()
+# endregion
 
 
+# region Creates
 # Создание таблицы Компании
 def create_table_company():
     data = '''
@@ -68,10 +67,10 @@ def create_table_company():
     __exec_sql(data)
 
 
-# Создание таблицы Объёмы (для хранения истории объёмов продаж акций за разные дни)
-def create_table_volume():
+# Создание таблицы Информация (для хранения истории объёмов продаж акций и курс акций за разные дни)
+def create_table_info():
     data = '''
-        CREATE TABLE IF NOT EXISTS volume (
+        CREATE TABLE IF NOT EXISTS info (
             company_id integer,
             date text NOT NULL,
             volume integer NOT NULL,
@@ -80,8 +79,10 @@ def create_table_volume():
         );
     '''
     __exec_sql(data)
+# endregion
 
 
+# region Inserts
 # Вставка строки в таблицу Компании
 def insert_company(company):
     data = f'''
@@ -91,129 +92,9 @@ def insert_company(company):
     __exec_sql(data)
 
 
-# Вставка строки в таблицу Объёмы
-def insert_volume(company, volume):
-    data = f'''
-            INSERT INTO volume(name, symbol, creation_date)
-            VALUES ({int(company['iexId'])}, '{volume['date']}', {volume['volume']});
-        '''
-    __exec_sql(data)
-
-
-# Вставка датафрейма с объёмами
-def insert_volumes(df):
-    __insert_df(df, 'volume')
-
-
-# Получение всех объёмов по определённой компании
-def get_chart_of_company_volume(company_id_list, date_from, date_to, type='vwap'):
-    company_id_list = ', '.join([str(i) for i in company_id_list])
-
-    if type == 'vwap':
-        data = f'''
-            SELECT 
-                c.id company_id,
-                c.name company_name,
-                v.date date,
-                v.vwap volume
-            FROM company c
-                JOIN volume v
-                    ON v.company_id = c.id
-            WHERE v.date BETWEEN "{date_from}" AND "{date_to}"  
-                AND c.id IN ({company_id_list})             
-                '''
-    else:
-        data = f'''
-            SELECT 
-                c.id company_id,
-                c.name company_name,
-                v.date date,
-                v.volume volume
-            FROM company c
-                JOIN volume v
-                    ON v.company_id = c.id
-            WHERE v.date BETWEEN "{date_from}" AND "{date_to}"  
-                AND c.id IN ({company_id_list})             
-        '''
-    df = __get_data(data)
-    # plt.close('all')
-    df.groupby(['date', 'company_name'])['volume'].sum().unstack().plot(figsize=(10, 6))
-
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graph_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-    return 'data:image/png;base64,{}'.format(graph_url)
-
-
-# Получение всех значений из таблицы Компании
-def get_all_companies():
-    data = f'''
-            SELECT *
-            FROM company        
-        '''
-    return __get_data(data)
-
-
-def get_all_volumes():
-    data = f'''
-            SELECT *
-            FROM volume        
-            '''
-    return __get_data(data)
-
-
-# Генерация рандомной даты для поля Дата Создания Компании
-def generate_random_date():
-    year = randrange(1920, 2000)
-    month = randrange(1, 12)
-    day = randrange(1, 28)
-    date = datetime.date(year=year, month=month, day=day)
-    return str(date)
-
-# Удаление данных из таблицы Company
-def __company_clear(company=None):
-    if not company:
-        data = '''
-            DELETE FROM company   
-        '''
-    else:
-        data = f'''
-                    DELETE FROM company
-                    WHERE company.id = {company['iexId']} 
-                '''
-    __exec_sql(data)
-
-
-# Удаление данных из таблицы Volume
-def __volume_clear(company=None):
-    if not company:
-        data = '''
-            DELETE FROM volume
-        '''
-    else:
-        data = f'''
-            DELETE FROM volume
-            WHERE volume.company_id = {company['iexId']} 
-        '''
-    __exec_sql(data)
-
-
-# Удаление таблицы Company
-def __remove_company_table():
-    data = '''
-        DROP TABLE IF EXISTS company
-    '''
-    __exec_sql(data)
-
-
-# Удаление таблицы Volume
-def __remove_volume_table():
-    data = '''
-        DROP TABLE IF EXISTS volume
-    '''
-    __exec_sql(data)
+# Вставка датафрейма в Информация
+def insert_info(df):
+    __insert_df(df, 'info')
 
 
 # Вставка тестовой компании
@@ -234,6 +115,43 @@ def insert_handmade_company():
     }
     insert_company(company)
 
+# endregion
+
+
+# region Selects
+# Получение графика по данным запроса
+def get_chart_by_form_data(company_id_list, date_from, date_to, type='vwap'):
+    df = get_company_info(company_id_list, date_from, date_to, type)
+    # plt.close('all')
+    df.groupby(['date', 'company_name'])['inf_field'].sum().unstack().plot(figsize=(10, 6))
+
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graph_url = base64.b64encode(img.getvalue()).decode()
+    plt.close()
+    return 'data:image/png;base64,{}'.format(graph_url)
+
+
+
+# Получение информации по определённой компании
+def get_company_info(company_id_list, date_from=config.start_date, date_to=config.finish_date, type='vwap'):
+    company_id_list = ', '.join([str(i) for i in company_id_list])
+
+    data = f'''
+        SELECT 
+            c.id company_id,
+            c.name company_name,
+            i.date date,
+            i.{type} inf_field
+        FROM company c
+            JOIN info i
+                ON i.company_id = c.id
+        WHERE i.date BETWEEN "{date_from}" AND "{date_to}"  
+            AND c.id IN ({company_id_list})             
+    '''
+    return __get_data(data)
+
 
 # Получение списка кортежей (id компании, название компании)
 def get_companies_list():
@@ -250,13 +168,103 @@ def get_companies_list():
 
     return lst
 
+
+# Получение всех значений из таблицы Компании
+def get_all_companies():
+    data = f'''
+            SELECT *
+            FROM company        
+        '''
+    return __get_data(data)
+
+
+# Получение всех данных по таблице Информация
+def get_all_info():
+    data = f'''
+            SELECT *
+            FROM info        
+            '''
+    return __get_data(data)
+# endregion
+
+
+# region Removes / Drops
+# Генерация рандомной даты для поля Дата Создания Компании
+def generate_random_date():
+    year = randrange(1920, 2000)
+    month = randrange(1, 12)
+    day = randrange(1, 28)
+    date = datetime.date(year=year, month=month, day=day)
+    return str(date)
+
+
+# Удаление данных из таблицы Company
+def __company_data_clear(company=None):
+    if not company:
+        data = '''
+            DELETE FROM company   
+        '''
+    else:
+        data = f'''
+                    DELETE FROM company
+                    WHERE company.id = {company} 
+                '''
+    __exec_sql(data)
+
+
+# Удаление данных из таблицы info
+def __info_data_clear(company=None):
+    if not company:
+        data = '''
+            DELETE FROM info
+        '''
+    else:
+        data = f'''
+            DELETE FROM info
+            WHERE info.company_id = {company['iexId']} 
+        '''
+    __exec_sql(data)
+
+
+# Удаление таблицы Company
+def __remove_company_table():
+    data = '''
+        DROP TABLE IF EXISTS company
+    '''
+    __exec_sql(data)
+
+
+# Удаление таблицы Info
+def __remove_info_table():
+    data = '''
+        DROP TABLE IF EXISTS info
+    '''
+    __exec_sql(data)
+
+
+# Получение списка компаний, не имеющих запись в info
+def get_companies_without_info():
+    cdata = '''
+        SELECT id company
+        FROM company
+    '''
+    cdf = __get_data(cdata)
+    ids_from_company = set(cdf['company'].to_list())
+
+    idata = '''
+        SELECT company_id info
+        FROM info
+    '''
+    idf = __get_data(idata)
+    ids_from_info = set(idf['info'].to_list())
+
+    return list(ids_from_company - ids_from_info)
+# endregion
+
+
 if __name__ == '__main__':
 
-    # __remove_volume_table()
-
-    print(get_all_volumes())
-
-    # insert_handmade_company()
-    # df = get_all_companies()
-    # print(df)
+    # print(get_company_info([692]))
+    # print(get_all_info())
+    pass
 

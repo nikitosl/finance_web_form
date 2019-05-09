@@ -16,7 +16,7 @@ def generate_plot(form):
     start_date = str(form.start_date_dt_tx.data)
     finish_date = str(form.finish_date_dt_tx.data)
     chart_type = form.chart_type_rbtn.data
-    return db_worker.get_chart_of_company_volume(comps, start_date, finish_date, type=chart_type)
+    return db_worker.get_chart_by_form_data(comps, start_date, finish_date, type=chart_type)
 
 
 @app.route('/', methods=['GET', 'POST'])

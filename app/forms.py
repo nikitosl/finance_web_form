@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Radio
 from wtforms.validators import InputRequired, Email, Length, AnyOf
 from app.db import db_worker
 import datetime
+import config
 
 
 def not_empty_validator(form, field):
@@ -19,14 +20,14 @@ def is_date_validator(form, field):
 
 def start_date_validator(form, field):
     if is_date_validator(form, field):
-        if field.data < datetime.date(year=2018, month=4, day=5):
-            raise ValueError('Слишком рано для начальной даты. Есть данные, начиная с 05.04.2018')
+        if field.data < config.start_date:
+            raise ValueError(f'Слишком рано для начальной даты. Есть данные, начиная с {config.start_date}')
 
 
 def finish_date_validator(form, field):
     if is_date_validator(form, field):
-        if field.data < datetime.date(year=2018, month=4, day=5):
-            raise ValueError('Слишком поздно для конечной даты. Есть данные до 11.04.2019')
+        if field.data > config.finish_date:
+            raise ValueError(f'Слишком поздно для конечной даты. Есть данные до {config.finish_date}')
 
 
 
@@ -42,12 +43,13 @@ class FinanceForm(Form):
 
     # ________________________________________________________ START DATE
     start_date_dt_tx = DateField(label='Начальная дата:', format='%d.%m.%Y',
-                                    validators=[start_date_validator], default=datetime.date(2018, 4, 5))
+                                    validators=[start_date_validator], default=config.start_date)
     finish_date_dt_tx = DateField(label='Конечная дата:', format='%d.%m.%Y',
-                                    validators=[finish_date_validator], default=datetime.date(2019, 4, 11))
+                                    validators=[finish_date_validator], default=config.finish_date)
     # _________________________________________________________ CHART TYPE
     chart_type_rbtn = RadioField('Критерий сравнения',
-                                choices=[('volume', 'Объем продаж акций'), ('vwap', 'Курс акций')])
+                                 choices=[('volume', 'Объем продаж акций'), ('vwap', 'Курс акций')],
+                                 default='vwap')
     # _________________________________________________________ BUTTONS
     print_btn = SubmitField(label='Нарисовать')
     clear_btn = SubmitField(label='Очистить')
