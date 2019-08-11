@@ -120,10 +120,12 @@ def insert_handmade_company():
 
 # region Selects
 # Получение графика по данным запроса
-def get_chart_by_form_data(company_id_list, date_from, date_to, type='vwap'):
-    df = get_company_info(company_id_list, date_from, date_to, type)
+def get_chart_by_dataframe(df):
     # plt.close('all')
     df.groupby(['date', 'company_name'])['inf_field'].sum().unstack().plot(figsize=(10, 6))
+    plt.title(f'График изменения {"курса акций" if type == "vwap" else "объема продаж акций"} компаний по времени')
+    plt.xlabel('Дата')
+    plt.ylabel('Курс акций ($)' if type == "vwap" else 'Объем продаж акций ($)')
 
     img = io.BytesIO()
     plt.savefig(img, format='png')
@@ -131,7 +133,6 @@ def get_chart_by_form_data(company_id_list, date_from, date_to, type='vwap'):
     graph_url = base64.b64encode(img.getvalue()).decode()
     plt.close()
     return 'data:image/png;base64,{}'.format(graph_url)
-
 
 
 # Получение информации по определённой компании

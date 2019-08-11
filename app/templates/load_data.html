@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block title %}
+    Data
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="width:900px;">
+            <div class="panel" style="background-color: #EEEEEE; padding: 50px; padding-top:20px; padding-bottom:10px; padding-right: 70px">
+                <h2 align="center" style="margin-bottom: 20px">Данные на основе примененных фильтров</h2>
+                <h4>{{ title }}</h4>
+                {{ table|safe }}
+            </div>
+    </div>
+{% endblock %}
+

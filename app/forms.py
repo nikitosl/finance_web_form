@@ -52,6 +52,8 @@ class FinanceForm(Form):
                                  default='vwap')
     # _________________________________________________________ BUTTONS
     print_btn = SubmitField(label='Нарисовать')
+    show_data_btn = SubmitField(label='Посмотреть')
+    load_data_btn = SubmitField(label='Скачать')
     clear_btn = SubmitField(label='Очистить')
 
     def data_clear(self):

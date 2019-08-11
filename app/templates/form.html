@@ -8,7 +8,7 @@
 {% block content %}
     <div class="container" style="width:700px;">
         <div class="panel" style="background-color: #EEEEEE; padding: 50px; padding-top:20px; padding-bottom:10px; padding-right: 70px">
-            <h2 align="center" style="margin-bottom: 20px">Настройка параметров графика</h2>
+            <h2 align="center" style="margin-bottom: 20px">Формирование запроса</h2>
             <form action="" method="post" name="settings">
                 <dl>
                     {{ form.csrf_token }}
@@ -48,9 +48,9 @@
                 <!-------------------------------------------------------------------SAVE / CANCEL-->
                 <div style="margin-top: 20px">
                     <div style="float: right;"> {{ wtf.form_field(form.print_btn, class="btn btn-primary") }} </div>
-{#                    <div style="float: right;"><input type="submit" class="btn btn-primary"></div>#}
+                    <div style="float: right; margin-right: 10px"> {{ wtf.form_field(form.show_data_btn, class="btn btn-success") }} </div>
+                    <div style="float: right;"> {{ wtf.form_field(form.load_data_btn, class="btn btn-success") }} </div>
                     <div style="margin-right: 120px;"> {{ wtf.form_field(form.clear_btn, class="btn btn-danger") }} </div>
-{#                    <div style="margin-right: 120px;"><input type="reset" class="btn btn-danger"></div>#}
                 </div>
             </form>
         </div>
