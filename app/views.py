@@ -2,7 +2,7 @@ from app import app
 import flask
 from flask import request, render_template, flash, redirect, url_for, send_file
 from app.forms import *
-import json
+import os
 import datetime
 from datetime import datetime
 from app.db import db_worker
@@ -84,10 +84,12 @@ def index():
 
                 # Обработка df для красивого вывода
                 df = df_preparation_for_html(df)
-                filename = '/Users/nikita/PycharmProjects/finance_web_form/app/static/company_info.xlsx'
-                df.to_excel(filename, index=False)
+                root_dir = os.path.dirname(__file__)
+                filepath = os.path.join(root_dir, 'static', 'company_info.xlsx')
+                print(filepath)
+                df.to_excel(filepath, index=False)
                 try:
-                    return send_file(filename, as_attachment=True, attachment_filename='company_info.xlsx')
+                    return send_file(filepath, as_attachment=True, attachment_filename='company_info.xlsx')
                 except Exception as e:
                     return e
 
